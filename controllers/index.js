@@ -1,4 +1,6 @@
 const DB = [];
+const NAME = [];
+const TIME = [];
 
 const register = async (req, res) => {
   const { restaurant_name, fullname, mobile, password } = req.body;
@@ -11,10 +13,13 @@ const register = async (req, res) => {
   try {
     const registerUser = DB.push({
       restaurant_name,
+      restaurant_id: "1",
       mobile,
       password,
       fullname,
     });
+
+    NAME.push(restaurant_name);
 
     // Implement JWT for session management
 
@@ -33,7 +38,7 @@ const searchRes = async (req, res) => {
       .json({ success: false, message: "Please enter restaurant name" });
   }
   try {
-    const getRest = DB.includes(restaurant_name);
+    const getRest = NAME.includes(restaurant_name);
 
     if (!getRest) {
       return res.status(404).json({
@@ -53,20 +58,22 @@ const searchRes = async (req, res) => {
 };
 
 const bookTable = async (req, res) => {
-  const { restaurant_id, timeslot, guest } = req.body;
+  const { restaurant_name, timeslot, guest } = req.body;
 
-  if (!restaurant_id) {
+  if (!restaurant_name) {
     return res
       .status(400)
-      .json({ success: false, message: "Please enter restaurant ID" });
+      .json({ success: false, message: "Please enter restaurant name" });
   }
 
   if (!timeslot) {
-    return res.status(400).json({ success: false, message: "Please enter timeslot" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Please enter timeslot" });
   }
 
   try {
-    const getRest = DB.includes(restaurant_id);
+    const getRest = NAME.includes(restaurant_name);
 
     if (!getRest) {
       return res.status(404).json({
@@ -75,7 +82,7 @@ const bookTable = async (req, res) => {
       });
     }
 
-    const getTimeslot = DB.includes(timeslot);
+    const getTimeslot = TIME.includes(timeslot);
 
     if (!getTimeslot) {
       return res.status(404).json({
@@ -84,10 +91,8 @@ const bookTable = async (req, res) => {
       });
     }
 
-    const getBooking = DB.push({
-      restaurant_id,
+    const getBooking = TIME.push({
       timeslot,
-      guest,
     });
 
     res.status(200).json({
@@ -101,39 +106,25 @@ const bookTable = async (req, res) => {
 };
 
 const addSlot = async (req, res) => {
-  const { restaurant_id, timeslot } = req.body;
-
-  if (!restaurant_id) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please enter restaurant ID" });
-  }
+  const { timeslot } = req.body;
 
   if (!timeslot) {
-    return res.status(400).json({ success: false, message: "Please enter timeslot" });
+    return res
+      .status(400)
+      .json({ success: false, message: "Please enter timeslot" });
   }
 
   // Implement authentication
 
   try {
-    const getRest = DB.includes(restaurant_id);
-
-    if (!getRest) {
-      return res.status(404).json({
-        success: false,
-        message: "No restaurant found",
-      });
-    }
-
-    const addTimeSlot = DB.push({
-      restaurant_id,
+    const addTimeSlot = TIME.push({
       timeslot,
     });
 
     res.status(200).json({
       success: true,
       message: "Timeslot added successfully",
-      time_slot: addTimeSlot,
+      time_slot: timeslot,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
